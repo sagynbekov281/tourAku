@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { RiSendPlaneLine, RiTelegramLine, RiWhatsappLine, RiInstagramLine, RiMapPinLine, RiPhoneLine, RiMailLine, RiTimeLine, RiArrowDownSLine } from 'react-icons/ri';
 import AnimSection from '../components/AnimSection';
 import { useTours } from '../hooks/useTours';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../api';
 
 type Stage = 'form' | 'otp' | 'done';
 
@@ -63,7 +62,9 @@ export default function ContactPage() {
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        setError(Array.isArray(data.errors) ? data.errors.join(', ') : data.error || t('contact.errGeneric'));
+        const message = Array.isArray(data.errors) ? data.errors.join(', ') : data.error || t('contact.errGeneric');
+        console.error('[booking] Сервер отклонил заявку:', { status: res.status, message });
+        setError(message);
         return;
       }
 
@@ -76,7 +77,8 @@ export default function ContactPage() {
         setStage('done');
         setForm({ name: '', phone: '', tour: '', peopleCount: '2', message: '' });
       }
-    } catch {
+    } catch (err) {
+      console.error('[booking] Не удалось отправить заявку:', err);
       setError(t('contact.errNetwork'));
     } finally {
       setSubmitting(false);

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FALLBACK_GUIDES, FALLBACK_GUIDES_EN, type Guide } from '../data';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { API_URL } from '../api';
 const cacheKey = (lang: string) => `tourco_guides_cache_${lang}`;
 
 type ApiGuide = {
