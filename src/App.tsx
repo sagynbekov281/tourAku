@@ -5,6 +5,8 @@ import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import ToursPage from './pages/ToursPage';
 import GuidesPage from './pages/GuidesPage';
+import GuideDetailPage from './pages/GuideDetailPage';
+import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 
 export default function App() {
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/tours" element={<ToursPage />} />
         <Route path="/guides" element={<GuidesPage />} />
+        <Route path="/guides/:id" element={<GuideDetailPage />} />
+        <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
       <Footer />

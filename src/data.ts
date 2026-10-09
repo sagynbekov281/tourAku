@@ -28,13 +28,15 @@ export type Tour = {
 };
 
 export type Guide = {
-  id: number;
+  id: number | string;
   name: string;
   role: string;
   experience: string;
   languages: string[];
   regions: string[];
   bio: string;
+  about?: string;
+  photo?: string;
   initials: string;
 };
 

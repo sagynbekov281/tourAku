@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { RiArrowRightLine, RiCheckLine, RiTimeLine, RiCloseLine, RiGroupLine, RiStarFill, RiMapPin2Line, RiListCheck2 } from 'react-icons/ri';
 import AnimSection from '../components/AnimSection';
@@ -14,8 +14,17 @@ export default function ToursPage() {
   const [active, setActive] = useState('all');
   const [selected, setSelected] = useState<number | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const tours = useTours();
+  const selectedTourId = (location.state as { selectedTourId?: number } | null)?.selectedTourId;
+
+  useEffect(() => {
+    if (selectedTourId !== undefined && tours.some((tour) => tour.id === selectedTourId)) {
+      setSelected(selectedTourId);
+      navigate(location.pathname + location.search, { replace: true, state: null });
+    }
+  }, [selectedTourId, tours, navigate, location.pathname, location.search]);
 
   const filters = [
     { key: 'all', label: t('tours.filterAll') },
@@ -104,6 +113,13 @@ export default function ToursPage() {
                       </div>
                       <span className="text-slate-400 text-xs flex items-center gap-1"><RiTimeLine size={11} /> {tour.duration}</span>
                     </div>
+                    <button
+                      type="button"
+                      onClick={(event) => { event.stopPropagation(); setSelected(tour.id); }}
+                      className="mt-4 inline-flex items-center gap-2 self-start text-sm font-semibold text-[#16A34A] hover:text-[#15803D]"
+                    >
+                      {t('tours.details')} <RiArrowRightLine size={15} />
+                    </button>
                   </div>
                 </div>
               </AnimSection>

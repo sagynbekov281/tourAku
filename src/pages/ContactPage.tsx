@@ -166,7 +166,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <label className="text-xs text-slate-500 mb-1.5 block">{t('contact.labelPhone')} *</label>
-                        <input name="phone" value={form.phone} onChange={handle} required placeholder="+996 700 123 456" className={inputCls} />
+                        <input name="phone" value={form.phone} onChange={handle} required placeholder="+996 700 46 99 89" className={inputCls} />
                       </div>
                     </div>
 
@@ -251,8 +251,8 @@ export default function ContactPage() {
               <div className="space-y-3.5">
                 {[
                   { icon: RiMapPinLine, label: t('contact.address'), value: 'Бишкек, ул. Чуй 123' },
-                  { icon: RiPhoneLine, label: t('contact.phone'), value: '+996 700 123 456' },
-                  { icon: RiMailLine, label: t('contact.email'), value: 'info@tourco.kg' },
+                  { icon: RiPhoneLine, label: t('contact.phone'), value: '+996 700 46 99 89' },
+                  { icon: RiMailLine, label: t('contact.email'), value: 'khantengri.travel@gmail.com' },
                   { icon: RiTimeLine, label: t('contact.hours'), value: t('contact.hoursValue') },
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="flex items-start gap-3">
@@ -261,7 +261,11 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-slate-400 text-xs mb-0.5">{label}</p>
-                      <p className="text-[#0F172A] text-sm">{value}</p>
+                      {label === t('contact.phone')
+                        ? <a href="tel:+996700469989" className="text-[#0F172A] text-sm hover:text-[#16A34A]">{value}</a>
+                        : label === t('contact.email')
+                        ? <a href="mailto:khantengri.travel@gmail.com" className="text-[#0F172A] text-sm hover:text-[#16A34A]">{value}</a>
+                        : <p className="text-[#0F172A] text-sm">{value}</p>}
                     </div>
                   </div>
                 ))}
@@ -273,10 +277,10 @@ export default function ContactPage() {
               <div className="space-y-2.5">
                 {[
                   { icon: RiTelegramLine, label: 'Telegram', val: '@tourco_kg' },
-                  { icon: RiInstagramLine, label: 'Instagram', val: '@tourco.kg' },
-                  { icon: RiWhatsappLine, label: 'WhatsApp', val: '+996 700 123 456' },
-                ].map(({ icon: Icon, label, val }) => (
-                  <a key={label} href="#" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-all group">
+                  { icon: RiInstagramLine, label: 'Instagram', val: '@khantengri.travel.kg', href: 'https://www.instagram.com/khantengri.travel.kg/' },
+                  { icon: RiWhatsappLine, label: 'WhatsApp', val: '+996 700 46 99 89', href: 'https://wa.me/996700469989' },
+                ].map(({ icon: Icon, label, val, href }) => (
+                  <a key={label} href={href || '#'} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-all group">
                     <div className="w-7 h-7 rounded-lg bg-green-50 flex items-center justify-center">
                       <Icon className="text-[#16A34A]" size={14} />
                     </div>
