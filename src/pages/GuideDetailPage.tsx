@@ -2,12 +2,37 @@ import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { RiArrowLeftLine, RiMapPin2Line, RiTranslate2 } from 'react-icons/ri';
 import AnimSection from '../components/AnimSection';
-import { useGuides } from '../hooks/useGuides';
+import { LoadingNotice, CardSkeleton } from '../components/Loadingnotice';
+import { useGuidesState } from '../hooks/useGuides';
 
 export default function GuideDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const guide = useGuides().find((person) => String(person.id) === id);
+  const { guides, loading } = useGuidesState();
+  const guide = guides.find((person) => String(person.id) === id);
+
+  // Пока грузится, нельзя показывать «гид не найден»
+  if (loading && !guide) {
+    return (
+      <main className="min-h-screen pt-32 px-5 sm:px-8 max-w-5xl mx-auto">
+        <LoadingNotice
+          text={t('common.loadingGuide', 'Загружаем профиль…')}
+          slowText={t('common.serverWaking', 'Сервер просыпается, это займёт несколько секунд…')}
+        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-pulse" aria-hidden="true">
+          <div className="aspect-[4/5] rounded-3xl bg-slate-200" />
+          <div className="space-y-4 py-2">
+            <div className="h-3 w-1/4 bg-slate-200 rounded" />
+            <div className="h-8 w-3/4 bg-slate-200 rounded" />
+            <div className="h-4 w-1/2 bg-slate-200 rounded" />
+            <div className="h-3 w-full bg-slate-100 rounded" />
+            <div className="h-3 w-full bg-slate-100 rounded" />
+            <div className="h-3 w-2/3 bg-slate-100 rounded" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!guide) {
     return (

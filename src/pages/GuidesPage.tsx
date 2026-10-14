@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import AnimSection from '../components/AnimSection';
-import { useGuides } from '../hooks/useGuides';
+import { LoadingNotice, CardSkeleton, ErrorNotice } from '../components/Loadingnotice';
+import { useGuidesState } from '../hooks/useGuides';
 import { RiTranslate2, RiMapPin2Line, RiArrowRightLine } from 'react-icons/ri';
 
 export default function GuidesPage() {
   const { t } = useTranslation();
-  const guides = useGuides();
+  const { guides, loading, failed } = useGuidesState();
 
   return (
     <main className="min-h-screen pt-24">
@@ -17,8 +18,24 @@ export default function GuidesPage() {
           <p className="text-slate-500 max-w-md text-sm">{t('guides.subtitle')}</p>
         </AnimSection>
 
+        {loading && (
+          <LoadingNotice
+            text={t('common.loadingGuides', 'Подождите немного, загружаем команду…')}
+            slowText={t('common.serverWaking', 'Сервер просыпается, это займёт несколько секунд…')}
+          />
+        )}
+
+        {failed && (
+          <ErrorNotice
+            text={t('common.loadError', 'Не удалось загрузить данные. Проверьте интернет и попробуйте ещё раз.')}
+            buttonText={t('common.retry', 'Обновить')}
+          />
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {guides.map((g, i) => (
+          {loading && Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} photoHeight="h-64" />)}
+
+          {!loading && guides.map((g, i) => (
             <AnimSection key={g.id} delay={i * 50}>
               <Link to={`/guides/${g.id}`} aria-label={`${t('guides.details')}: ${g.name}`} className="tour-card block border border-slate-200 rounded-2xl bg-white overflow-hidden h-full flex flex-col">
                 <div className="relative h-64 overflow-hidden bg-green-50">
@@ -59,6 +76,10 @@ export default function GuidesPage() {
             </AnimSection>
           ))}
         </div>
+
+        {!loading && !failed && guides.length === 0 && (
+          <p className="text-center text-slate-500 py-12">{t('guides.empty', 'Гиды пока не добавлены')}</p>
+        )}
       </div>
     </main>
   );

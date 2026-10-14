@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { RiArrowRightLine, RiCheckLine, RiTimeLine, RiCloseLine, RiGroupLine, RiStarFill, RiMapPin2Line, RiListCheck2 } from 'react-icons/ri';
 import AnimSection from '../components/AnimSection';
 import SeatsBadge from '../components/SeatsBadge';
-import { useTours } from '../hooks/useTours';
+import { LoadingNotice, CardSkeleton, ErrorNotice } from '../components/Loadingnotice';
+import { useToursState } from '../hooks/useTours';
 import type { Tour, DifficultyKey } from '../data';
 
 const DIFFICULTY_ORDER: DifficultyKey[] = ['easy', 'medium', 'hard'];
@@ -16,7 +17,7 @@ export default function ToursPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const tours = useTours();
+  const { tours, loading, failed } = useToursState();
   const selectedTourId = (location.state as { selectedTourId?: number } | null)?.selectedTourId;
 
   useEffect(() => {
@@ -55,22 +56,40 @@ export default function ToursPage() {
           <p className="text-slate-500 max-w-md text-sm">{t('tours.subtitle')}</p>
         </AnimSection>
 
-        <AnimSection className="flex gap-2 flex-wrap mb-8 sm:mb-10 -mx-5 sm:mx-0 px-5 sm:px-0 overflow-x-auto sm:overflow-visible pb-1">
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setActive(f.key)}
-              className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                active === f.key ? 'bg-[#16A34A] text-white' : 'border border-slate-200 text-slate-500 hover:border-[#16A34A]/40 hover:text-[#0F172A]'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </AnimSection>
+        {!loading && tours.length > 0 && (
+          <AnimSection className="flex gap-2 flex-wrap mb-8 sm:mb-10 -mx-5 sm:mx-0 px-5 sm:px-0 overflow-x-auto sm:overflow-visible pb-1">
+            {filters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setActive(f.key)}
+                className={`shrink-0 px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  active === f.key ? 'bg-[#16A34A] text-white' : 'border border-slate-200 text-slate-500 hover:border-[#16A34A]/40 hover:text-[#0F172A]'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </AnimSection>
+        )}
+
+        {loading && (
+          <LoadingNotice
+            text={t('common.loadingTours', 'Подождите немного, загружаем туры…')}
+            slowText={t('common.serverWaking', 'Сервер просыпается, это займёт несколько секунд…')}
+          />
+        )}
+
+        {failed && (
+          <ErrorNotice
+            text={t('common.loadError', 'Не удалось загрузить данные. Проверьте интернет и попробуйте ещё раз.')}
+            buttonText={t('common.retry', 'Обновить')}
+          />
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((tour, i) => {
+          {loading && Array.from({ length: 6 }).map((_, i) => <CardSkeleton key={i} />)}
+
+          {!loading && filtered.map((tour, i) => {
             const Icon = tour.icon;
             const soldOut = tour.totalSeats ? (tour.seatsLeft ?? 0) <= 0 : false;
             return (
@@ -81,7 +100,7 @@ export default function ToursPage() {
                     soldOut ? 'border-slate-200 opacity-70' : 'border-slate-200 hover:border-[#16A34A]/40'
                   }`}
                 >
-                  <div className="tour-card-photo relative h-44 overflow-hidden">
+                  <div className="tour-card-photo relative h-44 overflow-hidden bg-slate-100">
                     <img src={tour.photo} alt={tour.title} className={`w-full h-full object-cover ${soldOut ? 'grayscale' : ''}`} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                     <span className="absolute top-3 left-3 text-[11px] font-semibold bg-white/90 backdrop-blur text-[#0F172A] rounded-full px-2.5 py-1">
@@ -126,6 +145,10 @@ export default function ToursPage() {
             );
           })}
         </div>
+
+        {!loading && !failed && tours.length === 0 && (
+          <p className="text-center text-slate-500 py-12">{t('tours.empty', 'Туры пока не найдены')}</p>
+        )}
       </div>
 
       {selected !== null && selectedTour && (

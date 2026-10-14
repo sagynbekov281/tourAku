@@ -3,14 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { RiArrowRightLine, RiMapPin2Line, RiShieldCheckLine, RiUserSmileLine, RiStarFill, RiTimeLine, RiLeafLine, RiTeamLine, RiHeartLine, RiPlayFill } from 'react-icons/ri';
 import AnimSection from '../components/AnimSection';
 import AboutIntroSection from '../components/AboutIntroSection';
-import { useTours } from '../hooks/useTours';
-import { useGuides } from '../hooks/useGuides';
+import { LoadingNotice, CardSkeleton } from '../components/Loadingnotice';
+import { useToursState } from '../hooks/useTours';
+import { useGuidesState } from '../hooks/useGuides';
 import { tourPhoto, HERO_PHOTO } from '../lib/photos';
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const tours = useTours().slice(0, 3);
-  const guides = useGuides().slice(0, 3);
+  const { tours: allTours, loading: toursLoading } = useToursState();
+  const { guides: allGuides, loading: guidesLoading } = useGuidesState();
+  const tours = allTours.slice(0, 3);
+  const guides = allGuides.slice(0, 3);
 
   const FEATURES = [
     { icon: RiShieldCheckLine, title: t('home.f1Title', 'Проверенные маршруты'), text: t('home.f1Text', 'Только лучшие локации') },
@@ -73,8 +76,18 @@ export default function HomePage() {
           </div>
           <Link to="/tours" className="text-sm text-[#16A34A] font-medium hover:underline flex items-center gap-1">{t('home.allTours')} <RiArrowRightLine size={14} /></Link>
         </AnimSection>
+
+        {toursLoading && (
+          <LoadingNotice
+            text={t('common.loadingTours', 'Подождите немного, загружаем туры…')}
+            slowText={t('common.serverWaking', 'Сервер просыпается, это займёт несколько секунд…')}
+          />
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {tours.map((tour, i) => {
+          {toursLoading && Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} photoHeight="h-48" />)}
+
+          {!toursLoading && tours.map((tour, i) => {
             const Icon = tour.icon;
             return (
               <AnimSection key={tour.id} delay={i * 60}>
@@ -133,8 +146,18 @@ export default function HomePage() {
           </div>
           <Link to="/guides" className="text-sm text-[#16A34A] font-medium hover:underline flex items-center gap-1">{t('home.allGuides')} <RiArrowRightLine size={14} /></Link>
         </AnimSection>
+
+        {guidesLoading && (
+          <LoadingNotice
+            text={t('common.loadingGuides', 'Подождите немного, загружаем команду…')}
+            slowText={t('common.serverWaking', 'Сервер просыпается, это займёт несколько секунд…')}
+          />
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-          {guides.map((g, i) => (
+          {guidesLoading && Array.from({ length: 3 }).map((_, i) => <CardSkeleton key={i} photoHeight="h-48" />)}
+
+          {!guidesLoading && guides.map((g, i) => (
             <AnimSection key={g.id} delay={i * 60}>
               <Link to={`/guides/${g.id}`} aria-label={`${t('guides.details')}: ${g.name}`} className="tour-card block border border-slate-200 rounded-2xl bg-white overflow-hidden h-full flex flex-col">
                 <div className="h-48 overflow-hidden bg-green-50">
